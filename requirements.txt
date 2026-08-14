@@ -1,0 +1,9 @@
+# Servidor (Render/Railway/PythonAnywhere)
+flask
+qrcode
+pillow
+requests
+gunicorn
+
+# App de escritorio (admin_app.py) — instalar localmente con:
+#   pip install PyQt6 requests

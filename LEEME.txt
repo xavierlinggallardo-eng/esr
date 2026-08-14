@@ -1,0 +1,106 @@
+TALLER — INVENTARIO (VERSIÓN EDITORIAL · PyQt6 · DARK/LIGHT)
+==============================================================
+
+Rediseño completo de la GUI con un lenguaje editorial minimalista.
+Manteniendo toda la funcionalidad original (API REST, QR único,
+notificaciones WhatsApp, polling de movimientos), se rediseñaron
+las dos interfaces desde cero, ahora con TEMA DARK y TEMA LIGHT.
+
+═══════════════════════════════════════════════════════════════════════
+NOVEDADES DE ESTA VERSIÓN
+═══════════════════════════════════════════════════════════════════════
+
+· TEMA DARK + TEMA LIGHT en ambas interfaces (admin y worker).
+  - Toggle en el masthead del admin (botón ◐ DARK / ◐ LIGHT).
+  - Toggle en el masthead del worker (HTML) con persistencia en
+    localStorage y auto-detección de prefers-color-scheme.
+  - Dark: fondo carbón (#0E0E0E), texto hueso (#EDEAE3), acento
+    dorado mate (#C9A961).
+  - Light: fondo papel (#FAFAF7), texto grafito (#2C2C2C), acento
+    azul tinta (#1E3A5F).
+
+· Inputs más grandes en el form de inventario:
+  - Altura mínima 44px (antes 34px).
+  - Anchos mínimos por campo (Nombre 220px, Categoría 180px, etc.).
+  - Más padding interno (10px arriba/abajo, 4px laterales).
+  - Placeholder más legible (15px serif itálica).
+
+· Vista del trabajador (HTML en server.py) REHECHA desde cero:
+  - Mismo lenguaje editorial que el admin.
+  - Soporte dark/light con toggle y auto-detección.
+  - Tipografía serif Fraunces para títulos, sans Inter, mono JetBrains.
+  - Índice de pasos tipo revista (01/02/03) con cursivas y markers.
+  - Card principal con sombras multicapa y esquina decorativa.
+  - Textura de grano SVG sutil (multiply en light, screen en dark).
+  - Micro-animaciones: fadeUp entre pasos, hover con elevación,
+    fill-up progresivo en botones, shake en errores.
+  - Stepper de cantidad tipográfico con líneas hairline.
+  - Footer tipo colophon.
+
+═══════════════════════════════════════════════════════════════════════
+DETALLE TÉCNICO
+═══════════════════════════════════════════════════════════════════════
+
+· App de escritorio (admin_app.py con PyQt6)
+  - Dos temas definidos en el dict THEMES = {"light": {...}, "dark": {...}}.
+  - Cada tema tiene: paper, paper_warm, paper_deep, ink, ink_soft,
+    ink_mute, ink_faint, ink_blue, ink_blue_2, oxblood, oxblood_deep,
+    moss, hairline, hairline_2, on_ink, on_accent, shadow.
+  - Toggle en el masthead llama a _toggle_theme() que reconstruye toda
+    la UI con el nuevo tema (rebuild completo para que todos los
+    widgets inline se actualicen correctamente).
+  - QSS generado dinámicamente con build_qss(theme).
+  - Botones primarios/secundarios/peligra con stylesheet inline forzado
+    (QSS a veces no aplica background en botones dentro de QStackedWidget).
+  - Inputs más altos (44px mínimo) y más anchos.
+
+· Vista del trabajador (HTML en server.py)
+  - Variables CSS en :root (light) y html[data-theme="dark"] (dark).
+  - Toggle en JS que setea localStorage('taller-theme') y aplica
+    data-theme en el <html>.
+  - Auto-detección con prefers-color-scheme al primer load.
+  - meta theme-color responsive (light/dark) para mobile.
+
+═══════════════════════════════════════════════════════════════════════
+ARCHIVOS
+═══════════════════════════════════════════════════════════════════════
+
+· server.py            — Flask con la vista HTML editorial (dark/light).
+· admin_app.py         — App de escritorio PyQt6 (dark/light + toggle).
+· preview_worker.html  — HTML standalone con datos demo para previsualizar.
+· database.py          — Sin cambios (mismo esquema SQLite).
+· notifications.py     — Sin cambios (CallMeBot WhatsApp).
+· config.py            — Sin cambios.
+· requirements.txt     — Nota sobre PyQt6 para el admin local.
+· Procfile             — Sin cambios (gunicorn server:app).
+
+═══════════════════════════════════════════════════════════════════════
+CÓMO PROBAR EL DISEÑO RÁPIDO
+═══════════════════════════════════════════════════════════════════════
+
+1. Abrí preview_worker.html en cualquier navegador.
+   Vas a ver el formulario editorial completo con datos demo.
+   Probá el toggle ◐ DARK / ◐ LIGHT en el masthead.
+   La preferencia se guarda en localStorage.
+
+2. Para correr el server de verdad en local:
+     pip install -r requirements.txt
+     python server.py
+   Y abrí http://localhost:5000 en el navegador.
+
+3. App de escritorio (PyQt6):
+     pip install PyQt6 requests
+     python admin_app.py
+   Probá el botón ◐ DARK en el masthead para cambiar de tema.
+
+═══════════════════════════════════════════════════════════════════════
+DEPLOY
+═══════════════════════════════════════════════════════════════════════
+
+Igual que la versión anterior. Subí esta carpeta a GitHub y conectala
+en Render/Railway/PythonAnywhere:
+
+  · Build Command:  pip install -r requirements.txt
+  · Start Command:  gunicorn server:app
+
+Las variables de entorno (ADMIN_KEY, WHATSAPP_*) se cargan igual que antes.
